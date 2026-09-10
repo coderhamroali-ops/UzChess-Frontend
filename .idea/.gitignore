@@ -1,10 +1,10 @@
 # Default ignored files
-/shelf/
-/workspace.xml
+/../../dars310./.idea/shelf/
+/../../dars310./.idea/workspace.xml
 # Ignored default folder with query files
-/queries/
+/../../dars310./.idea/queries/
 # Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
+/../../dars310./.idea/dataSources/
+/../../dars310./.idea/dataSources.local.xml
 # Editor-based HTTP Client requests
-/httpRequests/
+/../../dars310./.idea/httpRequests/
