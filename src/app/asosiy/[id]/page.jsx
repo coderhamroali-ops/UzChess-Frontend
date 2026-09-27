@@ -27,7 +27,7 @@ export default function Page() {
         <>
             <div className={"w-256.5 h-484.75 bg-[#1A1D1F] rounded-xl p-5 ml-8 mt-5 border"}>
                 <h1 className={"text-white text-[28px] font-bold"}>O‘zbekiston shaxmatchilari olimpiadada Armanistonlik raqiblarini  mag‘lub etishdi</h1>
-                <Image
+                <img
                     className={"w-246.5 rounded-xl object-cover"}
                     src={news.image}
                     alt={news.title}

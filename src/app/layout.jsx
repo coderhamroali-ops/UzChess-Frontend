@@ -1,6 +1,7 @@
 import './globals.css';
-import Heder from "@/app/Heder";
-import Footer from "@/app/Footer";
+import Footer from "@/app/Footer.jsx";
+import Header from "@/app/Heder.jsx";
+
 
 export default function Layout({children}) {
     return <>
@@ -9,8 +10,8 @@ export default function Layout({children}) {
             <title>intixon</title>
         </head>
         <body>
-        <Heder/>
-        {children }
+        <Header/>
+        {children}
         <Footer/>
         </body>
         </html>

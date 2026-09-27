@@ -2,11 +2,8 @@ import Kurslar2 from "./components/kurslar2.jsx";
 import Barcasi from "@/app/kurslar/components/Barcasi";
 import Yolduz from "@/app/kurslar/components/yolduz";
 import Karta from "@/app/commponent/Karta";
-import Image from "next/image";
 
-export default async function Page() {
-    const response = await fetch('http://localhost:8000/admin/courses/list')
-    const data = await response.json()
+export default  function Page() {
 
     return <div className={"w-min h-320"}>
         <div
@@ -39,11 +36,6 @@ export default async function Page() {
         </div>
         <div className={"relative bottom-130 left-90"}>
 
-
-            {data.data.map(item => <div key={item.image}>
-                <Image  src={item.image} alt={item.title} width={1024} height={768}/>
-                <p></p>
-            </div>)}
 
             <br/>
             <Kurslar2 img={"imgk4.svg"} reting={"5.0"} py={"O`z"} title={"Zurixdagi shaxmat musobaqasi"}/>
