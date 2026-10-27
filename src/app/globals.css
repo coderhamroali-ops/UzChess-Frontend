@@ -1,7 +1,27 @@
 @import "tailwindcss";
-body {
 
-    background-color: black;
+/* Figma'dagi UzChess ranglari */
+@theme {
+    --color-page: #111315;
+    --color-card: #1A1D1F;
+    --color-card-2: #232627;
+    --color-field: #15181A;
+    --color-line: #272B30;
+    --color-muted: #9DA1A3;
+    --color-primary: #1C92E0;
+    --color-primary-light: #4DB8FF;
+    --color-success: #82CC27;
+    --color-gold: #FFC93C;
+    --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--color-page);
+    color: #F7F9FA;
+}
+
+select {
+    appearance: none;
 }
 
 @keyframes shake {

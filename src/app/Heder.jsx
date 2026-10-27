@@ -1,224 +1,89 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import {usePathname} from "next/navigation";
+import {useAuth} from "@/context/AuthContext";
+import {fileUrl} from "@/lib/api";
+import {BellIcon, CartIcon, ChevronDown, ChevronRight, LoginIcon, SearchIcon} from "@/app/commponent/Icons";
+
+const NAV = [
+    {href: "/", label: "Asosiy"},
+    {href: "/asosiy", label: "Yangiliklar"},
+    {href: "/kurslar", label: "Kurslar"},
+    {href: "/Kutubxona", label: "Kutubxona"},
+    {href: "/Boglanish", label: "Bog‘lanish"},
+];
+
+function isActive(path, href) {
+    return href === "/" ? path === "/" : path.startsWith(href);
+}
 
 export default function Header() {
     const path = usePathname();
-
-    const [user, setUser] = useState(null);
-
-    useEffect(() => {
-        const getUser = async () => {
-            try {
-                const token = localStorage.getItem("accessToken");
-
-                if (!token) {
-                    return;
-                }
-
-                const response = await fetch(
-                    "http://localhost:8888/auth/me",
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-
-                if (!response.ok) {
-                    console.log("User ma'lumotini olishda xatolik");
-                    return;
-                }
-
-                const data = await response.json();
-
-                console.log("USER:", data);
-
-                setUser(data);
-            } catch (error) {
-                console.log("Xatolik:", error);
-            }
-        };
-
-        getUser();
-    }, []);
+    const {user} = useAuth();
+    const current = NAV.find((item) => item.href !== "/" && isActive(path, item.href));
 
     return (
-        <>
-            <div
-                className={
-                    "flex items-center justify-center w-344 h-19 bg-[#1A1D1F] rounded-2xl text-[#888888] m-3 p-3"
-                }
-            >
-                <div className={"flex w-26 h-10 gap-4 items-center"}>
-                    <img src={"/img1.svg"} alt="" />
-
-                    <img
-                        className={"w-px h-6"}
-                        src={"/img2.svg"}
-                        alt=""
-                    />
+        <header className="mx-auto w-full max-w-[1376px] px-4 pt-3">
+            <div className="flex h-19 items-center justify-between rounded-2xl bg-card px-6">
+                <div className="flex items-center gap-4">
+                    <Link href="/">
+                        <img src="/img1.svg" alt="UzChess"/>
+                    </Link>
+                    <span className="h-6 w-px bg-line"/>
+                    <button className="flex items-center gap-1 text-[14px] text-muted hover:text-white">
+                        O‘zbekcha <ChevronDown size={16}/>
+                    </button>
                 </div>
 
-                <nav>
-                    <div
-                        className={
-                            "flex justify-center gap-10 ml-70 p-3"
-                        }
-                    >
+                <nav className="hidden items-center gap-10 text-[14px] lg:flex">
+                    {NAV.map((item) => (
                         <Link
-                            href={"/"}
+                            key={item.href}
+                            href={item.href}
                             className={
-                                path === "/"
-                                    ? "text-amber-50 border-b-2 border-blue-500"
-                                    : "text-gray-500 hover:text-blue-500"
+                                isActive(path, item.href)
+                                    ? "border-b-2 border-primary pb-1 font-medium text-white"
+                                    : "pb-1 text-muted transition hover:text-white"
                             }
                         >
-                            Asosiy
+                            {item.label}
                         </Link>
-
-                        <Link
-                            href={"/asosiy"}
-                            className={
-                                path === "/asosiy"
-                                    ? "text-amber-50 border-b-2 border-blue-500"
-                                    : "text-gray-500 hover:text-blue-500"
-                            }
-                        >
-                            Yangiliklar
-                        </Link>
-
-                        <Link
-                            href={"/kurslar"}
-                            className={
-                                path === "/kurslar"
-                                    ? "text-amber-50 border-b-2 border-blue-500"
-                                    : "text-gray-500 hover:text-blue-500"
-                            }
-                        >
-                            Kurslar
-                        </Link>
-
-                        <Link
-                            href={"/Kutubxona"}
-                            className={
-                                path === "/Kutubxona"
-                                    ? "text-amber-50 border-b-2 border-blue-500"
-                                    : "text-gray-500 hover:text-blue-500"
-                            }
-                        >
-                            Kutubxona
-                        </Link>
-
-                        <p className={"text-gray-500"}>
-                            Bog‘lanish
-                        </p>
-                    </div>
+                    ))}
                 </nav>
 
-                <div
-                    className={
-                        "flex gap-7 items-center ml-30"
-                    }
-                >
-                    <img
-                        className={"w-6 h-6"}
-                        src={"/img3.svg"}
-                        alt=""
-                    />
+                <div className="flex items-center gap-6 text-muted">
+                    <button className="hover:text-white" aria-label="Qidirish"><SearchIcon/></button>
+                    <button className="hover:text-white" aria-label="Savatcha"><CartIcon/></button>
+                    <button className="hover:text-white" aria-label="Bildirishnomalar"><BellIcon/></button>
 
-                    <img
-                        className={"w-6 h-6"}
-                        src={"/img4.svg"}
-                        alt=""
-                    />
-
-                    <img
-                        className={"w-6 h-6"}
-                        src={"/img5.svg"}
-                        alt=""
-                    />
-
-                    {user && (
-                        <Link
-                            href={"/prome"}
-                            className={
-                                "font-bold flex items-center gap-1 relative right-4"
-                            }
-                        >
+                    {user ? (
+                        <Link href="/prome" className="flex items-center gap-3 font-medium text-white">
                             {user.fullName}
-
                             <img
-                                className={
-                                    "w-14 h-14 rounded-full object-cover"
-                                }
-                                src={
-                                    user.profileImage
-                                        ? `http://localhost:8888/uploads/${user.profileImage}`
-                                        : "/iiimg.png"
-                                }
+                                className="h-10 w-10 rounded-full object-cover"
+                                src={fileUrl(user.profileImage) ?? "/iiimg.png"}
                                 alt={user.fullName}
                             />
                         </Link>
-                    )}
-
-                    {!user && (
+                    ) : (
                         <Link
-                            href={"/prome"}
-                            className={" flex items-center  w-8 h-8 rounded-sm"}>
-                            <img width={32} height={32} className={" w-17 h-10 rounded-full  object-cover"} src={"/Surat.png"} alt=""/>
+                            href="/royxat"
+                            className="flex h-10 items-center gap-2 rounded-lg bg-primary-light px-6 text-[14px] font-medium text-white transition hover:bg-primary"
+                        >
+                            Kirish <LoginIcon size={18}/>
                         </Link>
                     )}
-
-                    <img
-                        className={"w-px h-6"}
-                        src={"/img2.svg"}
-                        alt=""
-                    />
-
-                    <Link href={"/royxat"}>
-                        <button
-                            className={"flex items-center justify-center text-amber-50 gap-2 hover:scale-108 hover:cursor-pointer w-33 h-10 bg-[#4DB8FF] rounded-lg"}>
-                            Kirish
-
-                            <img src="/log-in.svg" alt=""/>
-                        </button>
-                    </Link>
                 </div>
             </div>
 
-            <div className={"flex gap-2 ml-10 text-[#888888] text-[14px]"}>
-
-
-
-                {path !== "/" && (
-                    <>
-                        <img src={"/img14.svg"} alt="" />
-                <p>Asosiy</p>
-                        <img src={"/img15.svg"} alt="" />
-
-                        <p className={path === "/asosiy" ? "text-white" : ""}>
-                            {path === "/asosiy" ? "Yangiliklar" : ""}
-                        </p>
-
-                        <p className={path === "/kurslar" ? "text-white" : ""}>
-                            {path === "/kurslar" ? "Kurslar" : ""}
-                        </p>
-
-                        <p className={path === "/Kutubxona" ? "text-white" : ""}>
-                            {path === "/Kutubxona" ? "Kutubxona" : ""}
-                        </p>
-
-                        <p className={path === "/asosiy/[id]" ? "text-white" : ""}>
-                            {path === "/asosiy/[id]" ? "O‘zbekiston shaxmatchilari olimpiadada Armanistonlik raqiblarini mag‘lub etishdi" : ""}
-                        </p>
-                    </>
-                )}
-            </div>
-        </>
+            {current && (
+                <div className="mt-4 flex items-center gap-2 text-[14px] text-muted">
+                    <Link href="/" className="hover:text-white">Asosiy</Link>
+                    <ChevronRight size={14}/>
+                    <span className="text-white">{current.label}</span>
+                </div>
+            )}
+        </header>
     );
 }

@@ -1,12 +1,18 @@
-export default function Loyiharivojlantirish(){
-    return <>
-        <div
-            className={"w-81.5 h-20.5 rounded-lg flex justify-center gap-3 items-center bg-[#1A1D1F]"}>
-            <img className={"w-10.5 h-10.5"} src={"img00022.svg"} alt={""}/>
+import {HandIcon} from "@/app/commponent/Icons";
+
+export default function Loyiharivojlantirish() {
+    return (
+        <div className="flex items-center gap-4 rounded-xl bg-card px-5 py-4">
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/15 text-primary-light">
+                <HandIcon size={24}/>
+            </span>
             <div>
-                <h1 className={"text-amber-50"}>Loyiha rivojiga xissa</h1>
-                <p className={"text-[#888888]"}>Shaxmat rivojiga hissa qo‘shing</p>
+                <p className="flex items-center gap-2 font-medium text-white">
+                    Loyiha rivojiga hissa
+                    <span className="whitespace-nowrap rounded bg-primary px-1.5 text-[10px]">tez orada</span>
+                </p>
+                <p className="text-[13px] text-muted">Shaxmat rivojiga hissa qo‘shing</p>
             </div>
         </div>
-    </>
+    );
 }
