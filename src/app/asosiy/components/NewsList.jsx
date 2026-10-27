@@ -5,12 +5,12 @@ import Link from "next/link";
 import {fileUrl} from "@/lib/api";
 import {formatFullDate} from "@/lib/format";
 import Karta from "@/app/commponent/Karta";
-import Loyiharivojlantirish from "@/app/commponent/Loyiharivojlantirish";
+import TopKitoblar from "@/app/commponent/TopKitoblar";
 import {EmptyResult, SearchInput} from "@/app/commponent/Katalog";
 
 const PAGE_SIZE = 9;
 
-export default function NewsList({news}) {
+export default function NewsList({news, topBooks, authors}) {
     const [search, setSearch] = useState("");
     const [visible, setVisible] = useState(PAGE_SIZE);
 
@@ -60,7 +60,7 @@ export default function NewsList({news}) {
 
             <aside className="hidden flex-col gap-6 xl:flex">
                 <Karta/>
-                <Loyiharivojlantirish/>
+                <TopKitoblar books={topBooks} authors={authors}/>
             </aside>
         </div>
     );

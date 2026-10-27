@@ -4,7 +4,6 @@ import {useState} from "react";
 import {byId, fileUrl} from "@/lib/api";
 import {formatPrice, languageBadge} from "@/lib/format";
 import Karta from "@/app/commponent/Karta";
-import Loyiharivojlantirish from "@/app/commponent/Loyiharivojlantirish";
 import {BooksIcon, CartIcon, CategoryIcon, LevelIcon, UserIcon} from "@/app/commponent/Icons";
 import {
     applyFilters, EmptyResult, FilterPanel, LanguageBadge, LikeButton, Meta, PageTitle, RatingBadge, SearchInput,
@@ -100,7 +99,9 @@ export default function BooksList({books, authors, difficulties, categories, lan
 
             <aside className="hidden flex-col gap-6 xl:flex">
                 <Karta/>
-                <Loyiharivojlantirish/>
+                <a href="https://yoshlar.gov.uz" target="_blank" rel="noreferrer">
+                    <img src="/yoshlar-banner.png" alt="Yoshlar ishlari agentligi" className="w-full"/>
+                </a>
             </aside>
         </div>
     );

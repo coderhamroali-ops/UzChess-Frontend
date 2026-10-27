@@ -3,32 +3,36 @@ import {byId, fileUrl, getList} from "@/lib/api";
 import {formatDayMonth, formatFullDate} from "@/lib/format";
 import Karta from "@/app/commponent/Karta";
 import Loyiharivojlantirish from "@/app/commponent/Loyiharivojlantirish";
+import TopKitoblar from "@/app/commponent/TopKitoblar";
 import {ArrowRight, BooksIcon, CapIcon, ChevronRight, StarIcon} from "@/app/commponent/Icons";
 
-const MATCH_TYPES = [
-    {label: "Classic", className: "text-primary-light"},
-    {label: "Rapid", className: "text-gold"},
-    {label: "Blitz", className: "text-success"},
-];
+// MatchType: 0 Classic, 1 Rapid, 2 Blitz, 3 Bullet. Belgilar Figma eksportidan.
+const MATCH_TYPES = {
+    0: {label: "Classic", rating: "classic"},
+    1: {label: "Rapid", rating: "rapid", icon: "/img00055.svg"},
+    2: {label: "Blitz", rating: "blitz", icon: "/img00057.svg"},
+    3: {label: "Bullet", rating: "blitz", icon: "/img00056.svg"},
+};
 
 // winner: 0 - birinchi o'yinchi, 1 - ikkinchi, 2 - durang
-const SCORES = {0: ["1", "0"], 1: ["0", "1"], 2: ["½", "½"]};
+const isWinner = (match, side) => match.winner === side;
 
 export default async function Page() {
-    const [players, matches, news, courses] = await Promise.all([
+    const [players, matches, news, courses, books, authors] = await Promise.all([
         getList("/public/players/list?page=1&size=50"),
-        getList("/public/matches/list?page=1&size=10"),
+        getList("/public/matches/list?page=1&size=50"),
         getList("/news/public/list?page=1&size=4"),
         getList("/public/courses/lise?page=1&size=50"),
+        getList("/public/Books/list?page=1&size=50"),
+        getList("/public/authors/list?page=1&size=50"),
     ]);
 
     const playerById = byId(players);
     const ranking = [...players].sort((a, b) => (b.classic ?? 0) - (a.classic ?? 0)).slice(0, 5);
-    const topCourses = courses
-        .filter((course) => course.isPublished)
-        .sort((a, b) => Number(b.rating) - Number(a.rating))
-        .slice(0, 4);
-    const dayMatch = matches[0];
+    const lastMatches = [...matches].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+    const topCourses = courses.filter((course) => course.isPublished).sort((a, b) => a.id - b.id).slice(0, 4);
+    // Figma'dagi "Top kitoblar" — kutubxonaning birinchi kitobidan keyingi to'rttasi.
+    const topBooks = [...books].sort((a, b) => a.id - b.id).slice(1);
 
     return (
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[326px_1fr] xl:grid-cols-[326px_1fr_326px]">
@@ -40,13 +44,11 @@ export default async function Page() {
                         title="Kun o‘yini"
                         allowFullScreen
                     />
-                    {dayMatch && (
-                        <div className="mt-3 flex items-center justify-between rounded-lg bg-card-2 px-4 py-3 text-[13px]">
-                            <span className="text-white">{playerById[dayMatch.firstPlayer]?.fulName}</span>
-                            <span className="font-bold text-primary-light">VS</span>
-                            <span className="text-right text-white">{playerById[dayMatch.secondPlayer]?.fulName}</span>
-                        </div>
-                    )}
+                    <div className="mt-3 flex items-center justify-between rounded-lg bg-card-2 px-4 py-3 text-[13px]">
+                        <span className="text-white">Abdusattorov Nodirbek</span>
+                        <img src="/img00036.svg" alt="" className="h-8 w-8"/>
+                        <span className="text-right text-white">Magnus Carlsen</span>
+                    </div>
                 </Card>
 
                 <Card title="Reyting" action="Barchasi" href="/Reyting">
@@ -76,7 +78,7 @@ export default async function Page() {
                 <Card title="Yakunlangan o‘yinlar" action="Barchasi" href="/Reyting">
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[560px] text-left text-[13px]">
-                            <thead className="bg-line text-[12px] text-muted">
+                            <thead className="bg-line text-[11px] uppercase text-muted">
                             <tr>
                                 <th className="rounded-l-md px-3 py-2 font-medium">O‘yinchilar</th>
                                 <th className="px-3 py-2 font-medium">Natija</th>
@@ -86,25 +88,34 @@ export default async function Page() {
                             </tr>
                             </thead>
                             <tbody>
-                            {matches.map((match) => {
-                                const [first, second] = [playerById[match.firstPlayer], playerById[match.secondPlayer]];
-                                const [firstScore, secondScore] = SCORES[match.winner] ?? ["-", "-"];
+                            {lastMatches.map((match) => {
                                 const type = MATCH_TYPES[match.type] ?? MATCH_TYPES[0];
+                                const sides = [
+                                    [playerById[match.firstPlayer], match.firstPlayerResult, 0],
+                                    [playerById[match.secondPlayer], match.secondPlayerResult, 1],
+                                ];
                                 return (
                                     <tr key={match.id} className="border-b border-line last:border-0">
                                         <td className="px-3 py-3">
-                                            <p className="text-white">
-                                                {first?.fulName} <span className="text-muted">({first?.classic})</span>
-                                            </p>
-                                            <p className="text-white">
-                                                {second?.fulName} <span className="text-muted">({second?.classic})</span>
-                                            </p>
+                                            {sides.map(([player, , side]) => (
+                                                <p key={side} className="flex items-center gap-2 text-white">
+                                                    <img
+                                                        src={isWinner(match, side) ? "/img00050.svg" : "/img00051.svg"}
+                                                        alt="" className="h-3.5 w-3.5"
+                                                    />
+                                                    {player?.fulName}
+                                                    <span className="text-muted">({player?.[type.rating] ?? player?.classic})</span>
+                                                </p>
+                                            ))}
                                         </td>
                                         <td className="px-3 py-3 text-white">
-                                            <p>{firstScore}</p>
-                                            <p>{secondScore}</p>
+                                            {sides.map(([, result, side]) => <p key={side}>{result}</p>)}
                                         </td>
-                                        <td className={`px-3 py-3 font-medium ${type.className}`}>{type.label}</td>
+                                        <td className="px-3 py-3">
+                                            {type.icon
+                                                ? <img src={type.icon} alt={type.label} className="h-4"/>
+                                                : <span className="text-primary-light">{type.label}</span>}
+                                        </td>
                                         <td className="px-3 py-3 text-white">{match.moves}</td>
                                         <td className="px-3 py-3 text-white">{formatDayMonth(match.date)}</td>
                                     </tr>
@@ -115,16 +126,9 @@ export default async function Page() {
                     </div>
                 </Card>
 
-                <div className="flex items-center justify-between gap-4 rounded-xl bg-gradient-to-r from-[#06131D] via-[#0B2740] to-[#163B5B] px-6 py-5">
-                    <div>
-                        <p className="text-[12px] uppercase tracking-widest text-primary-light">Haftalik turnir</p>
-                        <p className="text-[24px] font-bold text-white">UzChess Global Championship</p>
-                    </div>
-                    <Link href="/asosiy"
-                          className="rounded-lg bg-[#0B1418]/70 px-6 py-2.5 text-[14px] font-medium text-white hover:bg-primary">
-                        Ko‘rish
-                    </Link>
-                </div>
+                <Link href="/asosiy" className="block overflow-hidden rounded-xl">
+                    <img src="/img00060.svg" alt="2022 Chess.com Global Championship" className="w-full"/>
+                </Link>
 
                 <div>
                     <div className="mb-3 flex items-center justify-between">
@@ -153,22 +157,22 @@ export default async function Page() {
                 <Loyiharivojlantirish/>
                 <Karta/>
                 <Card title="Top kurslar" action="Barchasi" href="/kurslar">
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col">
                         {topCourses.map((course) => (
                             <Link key={course.id} href={`/kurslar/${course.id}`}
-                                  className="flex gap-3 rounded-lg p-2 transition hover:bg-card-2">
+                                  className="group flex gap-3 border-b border-line py-3 last:border-0">
                                 <img className="h-16 w-16 shrink-0 rounded-lg object-cover" src={fileUrl(course.image)} alt=""/>
                                 <div>
-                                    <p className="text-[14px] font-medium text-white">{course.title}</p>
-                                    <p className="mt-1 flex items-center gap-1 text-[12px] text-muted">
+                                    <p className="text-[14px] font-medium text-white group-hover:text-primary-light">{course.title}</p>
+                                    <p className="mt-1 flex items-center gap-1 text-[12px] text-white">
                                         <StarIcon size={12} className="text-gold"/> {Number(course.rating).toFixed(1)}
-                                        <span className="ml-2">{course.reviewsCount} ta sharh</span>
                                     </p>
                                 </div>
                             </Link>
                         ))}
                     </div>
                 </Card>
+                <TopKitoblar books={topBooks} authors={authors}/>
             </aside>
         </div>
     );
