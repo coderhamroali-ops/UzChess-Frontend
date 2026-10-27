@@ -40,6 +40,16 @@ export async function getList(path) {
     }
 }
 
+// Bitta yozuvni oladi, topilmasa yoki backend ishlamasa null qaytaradi.
+export async function getOne(path) {
+    try {
+        const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
+        return res.ok ? res.json() : null;
+    } catch {
+        return null;
+    }
+}
+
 // Backend rasm yo'lini ("uploads\\image\\a.png" yoki to'liq URL) brauzer uchun URL'ga aylantiradi.
 export function fileUrl(path) {
     if (!path) return null;
